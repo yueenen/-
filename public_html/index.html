@@ -1,16 +1,175 @@
 <!DOCTYPE html>
-<!--
-To change this license header, choose License Headers in Project Properties.
-To change this template file, choose Tools | Templates
-and open the template in the editor.
--->
-<html>
-    <head>
-        <title>TODO supply a title</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
-    <body>
-        <div>TODO write content</div>
-    </body>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style type="text/css">
+		*{
+			margin: 0;
+			padding: 0;
+		}
+		html,body{
+			height: 100%;
+			overflow: hidden;
+		}
+		.wrap{
+			width: 980px;
+			margin: 0 auto;
+			position: relative;
+		}
+		.container{
+			width:100%;	/*显式的写上这句话，因为脱离标准流了，不自动拓展了*/
+			height: 100%;
+			position: absolute;
+			top: 0%;
+			left: 0;
+		}
+		.page{
+			width: 100%;
+			height: 100%;
+			background:url(images/page0_bg.jpg) center top no-repeat;
+			/*这是CSS3属性，cover就表示拉伸为盒子的大小*/
+			background-size: cover;
+			overflow: hidden;
+			position: relative;
+			perspective:900px;
+		}
+		.page1{background-image: url(images/page1_bg.jpg);}
+		.page2{background-image: url(images/page2_bg.jpg);}
+		.page3{background-image: url(images/page3_bg.jpg);}
+		.page4{background-image: url(images/page4_bg.jpg);}
+ 		
+ 		.page0 .photoshop{
+			width: 160px;
+			height: 160px;
+			border-radius: 50%;
+			background-color: rgba(255,255,255,0.6);
+			position: absolute;
+			top: 200px;
+			left: 600px;
+			/*调用动画*/
+			-webkit-animation:tiao 1s ease 0s infinite alternate;
+			text-align: center;
+			line-height: 160px;
+			color:blue;
+			font-size: 30px;
+		}
+		
+
+		/*定义动画*/
+		@-webkit-keyframes tiao{
+			from {
+				top:200px;
+			}
+			to {
+				top:250px;
+			}
+		}
+
+
+ 		.page1 .shan{
+ 			position: absolute;
+ 			top: 200px;
+ 			left: -200px;
+ 			/*藏起来的*/
+ 			transform:rotate(1000deg);
+ 			transition:all 3s ease 0s;
+ 		}
+ 		.page1.current .shan{
+ 			/*可见：*/
+ 			transform:rotate(0deg);
+ 		}
+ 		.page1 .tiao{
+ 			position: absolute;
+ 			top: 143px;
+			left: 408px;
+ 			transition:all 3s ease 3s;
+ 			opacity: 0;
+ 		}
+ 		.page1.current .tiao{
+ 			/*可见：*/
+ 			opacity: 1;
+ 		}
+ 		.page1 .para1{
+ 			position: absolute;
+ 			left: 530px;
+			top: 140px;
+ 			font-size: 30px;
+ 			color:white;
+ 			transform:rotateX(30deg) rotateY(50deg) translateZ(700px);
+ 			transition:all 3s ease 3s;
+ 		}
+ 		.page1.current .para1{
+ 			transform:none;
+ 		}
+	</style>
+	<script type="text/javascript" src="js/jquery-1.11.2.min.js"></script>
+	<script type="text/javascript" src="js/jquery.mousewheel.min.js"></script>
+	<script type="text/javascript" src="js/tantiao.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			var nowPage = 0;	//这里用一个变量，来表示当前所在屏幕的序号。
+								//合法值0、1、2、3、4
+			var lock = true;	//锁。函数节流用的一个变量。
+
+			//捕获滚轮事件
+			$(document).mousewheel(function(e,delta){
+				if(lock){
+					//鼠标滚轮往下滚，-1； 是用户习惯的序号变大的过程。 比如 0 → 1
+					//鼠标滚轮往上滚，1    是用户习惯的序号减小的过程。 比如 2 → 1
+					nowPage = nowPage - delta;		//不写在if语句之内。
+					//我要验收你
+					if(nowPage > 4){
+						nowPage = 4; //如果你的值改变的，超过了4，我就让你重新回到4
+					}else if(nowPage < 0){
+						nowPage = 0; //如果你的值改变的，小于了0，我就让你重新回到0
+					}
+
+					//console.log(nowPage);	//控制台输出
+
+					//让container进行动画
+					$(".container").animate(
+						{
+							"top": nowPage * -100 + "%"
+						}
+						,800
+						,"tantiao"
+					);
+
+					//让当前的page有current属性，而其他盒子没有current属性
+					$(".page").eq(nowPage).addClass("current").siblings().removeClass("current");
+
+					//函数节流
+					lock = false;	//设置lock为false。
+
+					//设置一个定时器。让2秒后，恢复lock为true。
+					setTimeout(function(){
+						lock = true;
+					},1000);
+				}
+			});
+		});
+	</script>
+</head>
+<body>
+	<div class="container">
+		<div class="page page0 current">
+			<div class="photoshop">
+				PhotoShop
+			</div>
+		</div>
+		<div class="page page1">
+			<div class="wrap">
+				<img src="images/shan.png" class="shan">
+				<img src="images/tiao.png" class="tiao">
+				<p class="para1">
+					全能设计师平均薪资
+				</p>
+			</div>
+		</div>
+		<div class="page page2"><h1>屏幕2</h1></div>
+		<div class="page page3"><h1>屏幕3</h1></div>
+		<div class="page page4"><h1>屏幕4</h1></div>
+	</div>
+</body>
 </html>
